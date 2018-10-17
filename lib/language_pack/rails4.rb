@@ -1,5 +1,6 @@
 require "language_pack"
 require "language_pack/rails3"
+require "fileutils"
 
 # Rails 4 Language Pack. This is for all Rails 4.x apps.
 class LanguagePack::Rails4 < LanguagePack::Rails3
@@ -66,8 +67,21 @@ WARNING
     "tmp/cache/assets"
   end
 
+  def bundle_js
+    log("Bundle JS files with webpack") do
+      front_end_path = './front_end'
+      Dir.chdir(front_end_path) do
+        puts Dir.pwd
+        `yarn install`
+        `yarn build`
+      end
+      FileUtils.rm_rf(front_end_path)
+    end
+  end
+
   def run_assets_precompile_rake_task
     instrument "rails4.run_assets_precompile_rake_task" do
+      bundle_js
       log("assets_precompile") do
         if Dir.glob("public/assets/{.sprockets-manifest-*.json,manifest-*.json}", File::FNM_DOTMATCH).any?
           puts "Detected manifest file, assuming assets were compiled locally"
