@@ -68,21 +68,21 @@ WARNING
   end
 
   def bundle_js
-    log("Bundle JS files with webpack") do
-      front_end_path = './front_end'
-      Dir.chdir(front_end_path) do
-        puts Dir.pwd
-        `yarn install`
-        `yarn build`
-      end
-      FileUtils.rm_rf(front_end_path)
+    puts 'Compile JS code under front_end with webpack'
+    front_end_path = './front_end'
+    Dir.chdir(front_end_path) do
+      puts Dir.pwd
+      `yarn install`
+      `yarn build`
     end
+    FileUtils.rm_rf(front_end_path)
   end
 
   def run_assets_precompile_rake_task
+    bundle_js
     instrument "rails4.run_assets_precompile_rake_task" do
-      bundle_js
       log("assets_precompile") do
+        bundle_js
         if Dir.glob("public/assets/{.sprockets-manifest-*.json,manifest-*.json}", File::FNM_DOTMATCH).any?
           puts "Detected manifest file, assuming assets were compiled locally"
           return true
